@@ -37,9 +37,45 @@ source install/local_setup.bash
 
 ---
 
-## 3. Running the Rust Node
+## 3. Running the Rust Nodes
 
-After building, launch the main Rust-based ROS 2 node:
+### Command Line Arguments
+
+#### Publisher Node Arguments
+```bash
+ros2 run rust_nodes simple_publisher <topic_name> <publish_rate_ms> <prefix> <suffix> <count_start>
+```
+- `topic_name`: Name of the ROS2 topic to publish to
+- `publish_rate_ms`: Publication rate in milliseconds
+- `prefix`: Text to appear before the counter
+- `suffix`: Text to appear after the counter
+- `count_start`: Initial value of the counter
+
+#### Subscriber Node Arguments
+```bash
+ros2 run rust_nodes simple_subscriber <topic_name> <output_file>
+```
+- `topic_name`: Name of the ROS2 topic to subscribe to
+- `output_file`: Path to the file where received messages will be logged
+
+
+## Manual Run
+You can run the nodes manually using the `ros2 run` command. For example:
+
+**Publisher:**
+```bash
+ros2 run rust_nodes simple_publisher my_topic 1000 "Hello" "World" 0
+# Publishes: "Hello 0 World", "Hello 1 World", etc. every 1 second
+```
+
+**Subscriber:**
+```bash
+ros2 run rust_nodes simple_subscriber my_topic ./subscriber_output.txt
+```
+
+## Launch Files
+
+For convenience, we have provided multi-level Python launch files under `src/rust_nodes/launch`.
 
 ```bash
 cd ~/ros2_ws/src/rust_nodes/launch
