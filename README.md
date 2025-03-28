@@ -1,6 +1,6 @@
 # ROS2 Rust Nodes - Custom ROS 2 Workspace with Rust
 
-🚀 This repository is a **ROS 2 workspace** (`ros2_ws`) that contains Rust-based ROS 2 nodes. It demonstrates how to build and launch a Rust-based ROS 2 package while ensuring a proper setup for `ros2_rust`.
+🚀 This repository is a **ROS 2 workspace** (`ros2_ws`) that contains a set of ROS 2 nodes written in Rust that demonstrate publisher/subscriber communication using the [ros2_rust](https://github.com/ros2-rust/ros2_rust) client library.
 
 ## 1. Prerequisites
 
