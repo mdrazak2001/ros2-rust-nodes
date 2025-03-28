@@ -491,10 +491,6 @@ name = "rosgraph_msgs"
 version = "1.2.1"
 
 [[patch.unused]]
-name = "rust_nodes"
-version = "0.1.0"
-
-[[patch.unused]]
 name = "rust_pubsub"
 version = "0.1.0"
 

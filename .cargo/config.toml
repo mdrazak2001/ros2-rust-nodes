@@ -1,6 +1,3 @@
-[patch.crates-io.rust_nodes]
-path = "/home/razak/ros2_ws/install/rust_nodes/share/rust_nodes/rust"
-
 [patch.crates-io.visualization_msgs]
 path = "/home/razak/workspace/install/visualization_msgs/share/visualization_msgs/rust"
 
