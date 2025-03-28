@@ -22,6 +22,7 @@ impl SimplePublisher {
         let msg = StringMsg {
             data: format!("{} {} {}", prefix, count, suffix),
         };
+        println!("Publishing: {}", msg.data);
         self.publisher.publish(msg)
     }
 }
@@ -56,7 +57,7 @@ fn main() -> Result<(), RclrsError> {
             if let Err(e) = publisher_clone.publish_data(&prefix, &suffix, count) {
                 eprintln!("Error publishing: {:?}", e);
             }
-            count += 2;
+            count += 1;
             thread::sleep(Duration::from_millis(publish_rate_ms));
         }
     });

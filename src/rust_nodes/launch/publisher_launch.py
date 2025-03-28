@@ -6,8 +6,8 @@ import os
 def generate_launch_description():
     # Parameters for the publisher node:
     topic_name = 'custom_topic'
-    publish_rate_ms = '1000'
-    prefix = 'Hellooo'
+    publish_rate_ms = '2000'
+    prefix = 'Hello'
     suffix = 'World'
     count_start = '0'
     

@@ -36,6 +36,7 @@ impl SimpleSubscriptionNode {
     // Process the latest message and write it to the provided file.
     fn process_data(&self, output_file: &str) {
         if let Some(ref msg) = *self.data.lock().unwrap() {
+            println!("Received: {}", msg.data);
             if let Ok(mut file) = OpenOptions::new()
                 .create(true)
                 .append(true)
