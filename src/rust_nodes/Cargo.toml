@@ -11,6 +11,14 @@ path="src/publisher.rs"
 name="simple_subscriber"
 path="src/subscriber.rs"
 
+[[bin]]
+name = "lsp_server"
+path = "src/lsp_server.rs"
+
+
 [dependencies]
 rclrs = "*"
 std_msgs = "*"
+tower-lsp = "0.20.0"  # (Check for the latest version)
+tokio = { version = "1.41.0", features = ["full"] }
+futures = "0.3"
