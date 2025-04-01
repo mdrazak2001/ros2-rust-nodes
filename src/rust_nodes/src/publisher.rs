@@ -7,17 +7,20 @@ struct SimplePublisher {
 }
 
 impl SimplePublisher {
-    // Create a publisher node using the executor's create_node method.
     fn new(executor: &Executor) -> Result<Self, RclrsError> {
-        // Create a node with name "publisher_node"
         let node = executor.create_node("publisher_node")?;
-        // The topic name is provided as the first command-line parameter.
-        let topic = std::env::args().nth(1).unwrap_or_else(|| "default_topic".into());
+
+        // Declare and get topic parameter
+        let topic: Arc<str> = node.declare_parameter("topic")
+            .default(Arc::from("default_topic"))  // Use String instead of &str
+            .mandatory()
+            .unwrap()
+            .get();
+        
         let publisher = node.create_publisher::<StringMsg>(&topic)?;
         Ok(Self { publisher })
     }
 
-    // Publish a message with a given prefix, count, and suffix.
     fn publish_data(&self, prefix: &str, suffix: &str, count: i32) -> Result<(), RclrsError> {
         let msg = StringMsg {
             data: format!("{} {} {}", prefix, count, suffix),
@@ -28,30 +31,40 @@ impl SimplePublisher {
 }
 
 fn main() -> Result<(), RclrsError> {
-    // Expect command-line parameters:
-    //   <executable> <topic_name> <publish_rate_ms> <prefix> <suffix> <count_start>
-    let args: Vec<String> = std::env::args().collect();
-    if args.len() < 6 {
-        eprintln!(
-            "Usage: {} <topic_name> <publish_rate_ms> <prefix> <suffix> <count_start>",
-            args[0]
-        );
-        return Ok(());
-    }
-    // Note: the first parameter (topic_name) is used inside SimplePublisher.
-    let publish_rate_ms: u64 = args[2].parse().unwrap_or(1000);
-    let prefix = args[3].clone();
-    let suffix = args[4].clone();
-    let mut count: i32 = args[5].parse().unwrap_or(0);
-
-    // Create a ROS 2 context and executor.
     let context = Context::default_from_env()?;
     let mut executor = context.create_basic_executor();
 
     let publisher = Arc::new(SimplePublisher::new(&executor)?);
     let publisher_clone = Arc::clone(&publisher);
 
-    // Spawn a thread to publish messages periodically.
+    // Create parameter node and declare parameters
+    let node = executor.create_node("parameter_node")?;
+    
+    // Declare parameters with defaults
+    let publish_rate_ms: u64 = node.declare_parameter("publish_rate_ms")
+        .default(1000)
+        .mandatory()
+        .unwrap()
+        .get() as u64;
+    
+    let prefix: Arc<str> = node.declare_parameter("prefix")
+        .default(Arc::from("Hello"))  // Use String instead of &str
+        .mandatory()
+        .unwrap()
+        .get();
+    
+    let suffix: Arc<str> = node.declare_parameter("suffix")
+        .default(Arc::from("World"))  // Use String instead of &str
+        .mandatory()
+        .unwrap()
+        .get();
+    
+    let mut count: i32 = node.declare_parameter("count_start")
+        .default(0)
+        .mandatory()
+        .unwrap()
+        .get() as i32;
+
     thread::spawn(move || {
         loop {
             if let Err(e) = publisher_clone.publish_data(&prefix, &suffix, count) {
@@ -62,6 +75,5 @@ fn main() -> Result<(), RclrsError> {
         }
     });
 
-    // Spin the executor to process callbacks.
     executor.spin(SpinOptions::default()).first_error()
 }
