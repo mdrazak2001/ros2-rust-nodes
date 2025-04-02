@@ -64,22 +64,28 @@ You can run the nodes manually using the `ros2 run` command. For example:
 
 **Publisher:**
 ```bash
-ros2 run rust_nodes simple_publisher my_topic 1000 "Hello" "World" 0
+ros2 run rust_nodes simple_publisher --ros-args \
+  --param topic:=my_topic \
+  --param publish_rate_ms:=1000 \
+  --param prefix:="Hello" \
+  --param suffix:="World" \
+  --param count_start:=0
 # Publishes: "Hello 0 World", "Hello 1 World", etc. every 1 second
 ```
 
 **Subscriber:**
 ```bash
-ros2 run rust_nodes simple_subscriber my_topic ./subscriber_output.txt
+ros2 run rust_nodes simple_subscriber --ros-args \
+  --param topic:=my_topic \
+  --param output_file:=subscriber_output.txt
 ```
 
 ## Launch Files
 
-For convenience, we have provided multi-level Python launch files under `src/rust_nodes/launch`.
+For convenience, multi-level Python launch files are provided in `rust_nodes_bringup`:
 
 ```bash
-cd ~/ros2_ws/src/rust_nodes/launch
-ros2 launch main_launch.py
+ros2 launch rust_nodes_bringup main_launch.py publish_rate_ms:=5000 prefix:=Hi suffix:=There count_start:=10
 ```
 
 
