@@ -39,24 +39,23 @@ source install/local_setup.bash
 
 ## 3. Running the Rust Nodes
 
-### Command Line Arguments
+The nodes now use ROS 2 parameters instead of command-line arguments. Parameters can be set using --ros-args --param when running the nodes.
 
-#### Publisher Node Arguments
+#### Publisher Node Parameters
 ```bash
-ros2 run rust_nodes simple_publisher <topic_name> <publish_rate_ms> <prefix> <suffix> <count_start>
+topic: <string>             # Name of the ROS2 topic to publish to  
+publish_rate_ms: <integer>  # Publication rate in milliseconds  
+prefix: <string>            # Text appearing before the counter  
+suffix: <string>            # Text appearing after the counter  
+count_start: <integer>      # Initial counter value  
 ```
-- `topic_name`: Name of the ROS2 topic to publish to
-- `publish_rate_ms`: Publication rate in milliseconds
-- `prefix`: Text to appear before the counter
-- `suffix`: Text to appear after the counter
-- `count_start`: Initial value of the counter
 
-#### Subscriber Node Arguments
+#### Subscriber Node Parameters
 ```bash
-ros2 run rust_nodes simple_subscriber <topic_name> <output_file>
+topic: <string>        # Name of the ROS2 topic to subscribe to  
+output_file: <string>  # Path to the file where received messages will be logged  
+
 ```
-- `topic_name`: Name of the ROS2 topic to subscribe to
-- `output_file`: Path to the file where received messages will be logged
 
 
 ## Manual Run
