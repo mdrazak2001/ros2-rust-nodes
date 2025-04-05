@@ -39,24 +39,23 @@ source install/local_setup.bash
 
 ## 3. Running the Rust Nodes
 
-### Command Line Arguments
+The nodes now use ROS 2 parameters instead of command-line arguments. Parameters can be set using --ros-args --param when running the nodes.
 
-#### Publisher Node Arguments
+#### Publisher Node Parameters
 ```bash
-ros2 run rust_nodes simple_publisher <topic_name> <publish_rate_ms> <prefix> <suffix> <count_start>
+topic: <string>             # Name of the ROS2 topic to publish to  
+publish_rate_ms: <integer>  # Publication rate in milliseconds  
+prefix: <string>            # Text appearing before the counter  
+suffix: <string>            # Text appearing after the counter  
+count_start: <integer>      # Initial counter value  
 ```
-- `topic_name`: Name of the ROS2 topic to publish to
-- `publish_rate_ms`: Publication rate in milliseconds
-- `prefix`: Text to appear before the counter
-- `suffix`: Text to appear after the counter
-- `count_start`: Initial value of the counter
 
-#### Subscriber Node Arguments
+#### Subscriber Node Parameters
 ```bash
-ros2 run rust_nodes simple_subscriber <topic_name> <output_file>
+topic: <string>        # Name of the ROS2 topic to subscribe to  
+output_file: <string>  # Path to the file where received messages will be logged  
+
 ```
-- `topic_name`: Name of the ROS2 topic to subscribe to
-- `output_file`: Path to the file where received messages will be logged
 
 
 ## Manual Run
@@ -64,22 +63,28 @@ You can run the nodes manually using the `ros2 run` command. For example:
 
 **Publisher:**
 ```bash
-ros2 run rust_nodes simple_publisher my_topic 1000 "Hello" "World" 0
+ros2 run rust_nodes simple_publisher --ros-args \
+  --param topic:=my_topic \
+  --param publish_rate_ms:=1000 \
+  --param prefix:="Hello" \
+  --param suffix:="World" \
+  --param count_start:=0
 # Publishes: "Hello 0 World", "Hello 1 World", etc. every 1 second
 ```
 
 **Subscriber:**
 ```bash
-ros2 run rust_nodes simple_subscriber my_topic ./subscriber_output.txt
+ros2 run rust_nodes simple_subscriber --ros-args \
+  --param topic:=my_topic \
+  --param output_file:=subscriber_output.txt
 ```
 
 ## Launch Files
 
-For convenience, we have provided multi-level Python launch files under `src/rust_nodes/launch`.
+For convenience, multi-level Python launch files are provided in `rust_nodes_bringup`:
 
 ```bash
-cd ~/ros2_ws/src/rust_nodes/launch
-ros2 launch main_launch.py
+ros2 launch rust_nodes_bringup main_launch.py publish_rate_ms:=5000 prefix:=Hi suffix:=There count_start:=10
 ```
 
 

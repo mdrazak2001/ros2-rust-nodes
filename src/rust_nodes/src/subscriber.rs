@@ -17,8 +17,14 @@ impl SimpleSubscriptionNode {
     // Create a subscriber node using the executor's create_node method.
     fn new(executor: &Executor) -> Result<Self, RclrsError> {
         let node = executor.create_node("subscriber_node")?;
-        // The topic name is provided as the first command-line parameter.
-        let topic = std::env::args().nth(1).unwrap_or_else(|| "default_topic".into());
+
+        // Declare and get topic parameter
+        let topic: Arc<str> = node.declare_parameter("topic")
+            .default(Arc::from("default_topic"))  // Use String instead of &str
+            .mandatory()
+            .unwrap()
+            .get();
+
         let data: Arc<Mutex<Option<StringMsg>>> = Arc::new(Mutex::new(None));
         let data_clone = Arc::clone(&data);
         let subscription = node.create_subscription::<StringMsg, _>(
@@ -55,22 +61,21 @@ impl SimpleSubscriptionNode {
 }
 
 fn main() -> Result<(), RclrsError> {
-    // Expect command-line parameters:
-    //   <executable> <topic_name> <output_file>
-    let args: Vec<String> = std::env::args().collect();
-    if args.len() < 3 {
-        eprintln!("Usage: {} <topic_name> <output_file>", args[0]);
-        return Ok(());
-    }
-    // The first parameter (topic_name) is used in subscription creation.
-    let output_file = args[2].clone();
-
     // Create a ROS 2 context and executor.
     let context = Context::default_from_env()?;
     let mut executor = context.create_basic_executor();
 
     let subscriber = Arc::new(SimpleSubscriptionNode::new(&executor)?);
     let subscriber_clone = Arc::clone(&subscriber);
+
+    // Create parameter node and declare parameters
+    let node = executor.create_node("parameter_node")?;
+
+    let output_file: Arc<str> = node.declare_parameter("output_file")
+        .default(Arc::from("subscriber_output.txt"))
+        .mandatory()
+        .unwrap()
+        .get();
 
     // Spawn a thread that periodically processes received messages and writes them to the file.
     thread::spawn(move || loop {
