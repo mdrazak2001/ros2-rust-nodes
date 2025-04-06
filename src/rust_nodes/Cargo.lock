@@ -703,6 +703,7 @@ name = "rust_nodes"
 version = "0.1.0"
 dependencies = [
  "futures",
+ "glob",
  "rclrs",
  "std_msgs",
  "tokio",
@@ -1238,6 +1239,10 @@ version = "0.4.1"
 [[patch.unused]]
 name = "rosgraph_msgs"
 version = "1.2.1"
+
+[[patch.unused]]
+name = "rust_nodes"
+version = "0.1.0"
 
 [[patch.unused]]
 name = "rust_pubsub"
