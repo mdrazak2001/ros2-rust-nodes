@@ -11,20 +11,17 @@ use std_msgs::msg::String as StringMsg;
 struct SimpleSubscriptionNode {
     _subscription: Arc<Subscription<StringMsg>>,
     data: Arc<Mutex<Option<StringMsg>>>,
+    node: Arc<Node>,
 }
 
 impl SimpleSubscriptionNode {
-    // Create a subscriber node using the executor's create_node method.
     fn new(executor: &Executor) -> Result<Self, RclrsError> {
         let node = executor.create_node("subscriber_node")?;
-
-        // Declare and get topic parameter
         let topic: Arc<str> = node.declare_parameter("topic")
-            .default(Arc::from("default_topic"))  // Use String instead of &str
+            .default(Arc::from("default_topic"))
             .mandatory()
             .unwrap()
             .get();
-
         let data: Arc<Mutex<Option<StringMsg>>> = Arc::new(Mutex::new(None));
         let data_clone = Arc::clone(&data);
         let subscription = node.create_subscription::<StringMsg, _>(
@@ -33,13 +30,13 @@ impl SimpleSubscriptionNode {
                 *data_clone.lock().unwrap() = Some(msg);
             },
         )?;
-        Ok(SimpleSubscriptionNode {
+        Ok(Self {
             _subscription: subscription,
             data,
+            node,
         })
     }
 
-    // Process the latest message and write it to the provided file.
     fn process_data(&self, output_file: &str) {
         if let Some(ref msg) = *self.data.lock().unwrap() {
             println!("Received: {}", msg.data);
@@ -61,28 +58,23 @@ impl SimpleSubscriptionNode {
 }
 
 fn main() -> Result<(), RclrsError> {
-    // Create a ROS 2 context and executor.
     let context = Context::default_from_env()?;
     let mut executor = context.create_basic_executor();
 
     let subscriber = Arc::new(SimpleSubscriptionNode::new(&executor)?);
     let subscriber_clone = Arc::clone(&subscriber);
 
-    // Create parameter node and declare parameters
-    let node = executor.create_node("parameter_node")?;
-
-    let output_file: Arc<str> = node.declare_parameter("output_file")
+    // Declare output_file on the subscriber_node
+    let output_file: Arc<str> = subscriber.node.declare_parameter("output_file")
         .default(Arc::from("subscriber_output.txt"))
         .mandatory()
         .unwrap()
         .get();
 
-    // Spawn a thread that periodically processes received messages and writes them to the file.
     thread::spawn(move || loop {
         subscriber_clone.process_data(&output_file);
         thread::sleep(Duration::from_millis(1000));
     });
 
-    // Spin the executor to process incoming messages.
     executor.spin(SpinOptions::default()).first_error()
 }
